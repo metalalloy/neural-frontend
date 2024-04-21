@@ -24,8 +24,7 @@ export async function fetch_path(route_id, route_dir) {
 export async function fetch_positions(route_ids, route_dirs, stop_lon, stop_lat) {
     try {
         const r = await fetch(`${API_URL}/positions?route_ids=${route_ids.join('&route_ids=')}&route_dirs=${route_dirs.join('&route_dirs=')}&stop_lon=${stop_lon}&stop_lat=${stop_lat}`);
-        console.warn(r.url);
-        console.warn(await r.json());
+        return await r.json();
     } catch {
         return {};
     }

@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Pressable,
+  ImageBackground,
 } from "react-native";
 import { fetch_stop, fetch_path, fetch_positions } from "./scripts/api";
 import * as ImagePicker from "expo-image-picker";
@@ -85,15 +86,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
 
-  // State to access the camera
-  const [startCamera, setStartCamera] = useState(false);
-
-  // State to show the camera preview
-  const [previewVisible, setPreviewVisible] = useState(false);
-
-  // State to obtain photo
-  const [capturedImage, setCapturedImage] = useState(null);
-
   // Function to pick an image from gallery
   const pickImageGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -114,9 +106,8 @@ export default function App() {
   // Function to capture an image using the device's camera
   const pickImageCamera = async () => {
     // Request permission to access the camera
-    const { status } = await Camera.requestCameraPermissionsAsync();
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status === "granted") {
-      setStartCamera(true);
 
       // Permission granted, proceed with launching camera
       let result = await ImagePicker.launchCameraAsync({
@@ -179,45 +170,6 @@ export default function App() {
         }
       });
   };
-  // const renderResponse = (obj, depth = 0) => {
-  //   return Object.keys(obj)
-  //     .sort()
-  //     .map((key, index) => {
-  //       const value = obj[key];
-  //       if (typeof value === "object" && value !== null) {
-  //         return (
-  //           <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
-  //             {key}:{renderResponse(value, depth + 1)}
-  //           </Text>
-  //         );
-  //       } else {
-  //         return (
-  //           <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
-  //             {`${key}: ${value}`}
-  //           </Text>
-  //         );
-  //       }
-  //     });
-  // };
-
-  const takePicture = async () => {
-    // camera is a reference to the Camera component
-    if (!camera) {
-      return;
-    }
-    const photo = await camera.takePictureAsync();
-    console.log(photo);
-    setPreviewVisible(true);
-    setCapturedImage(photo);
-  };
-
-  const retakePicture = () => {
-    setCapturedImage(null);
-    setPreviewVisible(false);
-    pickImageCamera();
-  };
-
-  const savePhoto = () => {};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -235,43 +187,10 @@ export default function App() {
         <Pressable style={styles.button} onPress={pickImageGallery}>
           <Text style={styles.buttonText}>Choose from gallery</Text>
         </Pressable>
-        {startCamera ? (
-          previewVisible && capturedImage ? (
-            <CameraPreview
-              photo={capturedImage}
-              savePhoto={savePhoto}
-              retakePicture={retakePicture}
-            />
-          ) : (
-            <Camera
-              style={{ flex: 1 }}
-              ref={(r) => {
-                camera = r;
-              }}
-            >
-              <View style={styles.cameraView}>
-                <View style={styles.cameraBtn1}>
-                  <View style={styles.cameraBtn2}>
-                    <TouchableOpacity
-                      onPress={takePicture}
-                      style={{
-                        width: 70,
-                        height: 70,
-                        bottom: 0,
-                        borderRadius: 50,
-                        backgroundColor: "#fff",
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-            </Camera>
-          )
-        ) : (
-          <Pressable style={styles.button} onPress={pickImageCamera}>
-            <Text style={styles.buttonText}>Use the Camera</Text>
-          </Pressable>
-        )}
+        <Pressable style={styles.button} onPress={pickImageCamera}>
+          <Text style={styles.buttonText}>Use the Camera</Text>
+        </Pressable>
+
         {image && (
           <Image
             source={{ uri: image }}
@@ -350,101 +269,4 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#132676", // Black color for text
   },
-  cameraView: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: "transparent",
-    flexDirection: "row",
-  },
-  cameraBtn1: {
-    position: "absolute",
-    bottom: 0,
-    flexDirection: "row",
-    flex: 1,
-    width: "100%",
-    padding: 20,
-    justifyContent: "space-between",
-  },
-  cameraBtn2: {
-    alignSelf: "center",
-    flex: 1,
-    alignItems: "center",
-  },
 });
-
-// returns the pic
-const CameraPreview = ({ photo, retakePicture, savePhoto }) => {
-  // console.log("sdsfds", photo);
-  return (
-    <View
-      style={{
-        backgroundColor: "transparent",
-        flex: 1,
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <ImageBackground
-        source={{ uri: photo && photo.uri }}
-        style={{
-          flex: 1,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "column",
-            padding: 15,
-            justifyContent: "flex-end",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <TouchableOpacity
-              onPress={retakePicture}
-              style={{
-                width: 130,
-                height: 40,
-
-                alignItems: "center",
-                borderRadius: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 20,
-                }}
-              >
-                Re-take
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={savePhoto}
-              style={{
-                width: 130,
-                height: 40,
-
-                alignItems: "center",
-                borderRadius: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 20,
-                }}
-              >
-                save photo
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-};

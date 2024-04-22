@@ -134,7 +134,6 @@ export default function App() {
             setLoading(true);
             const response = await fetch_stop(1002864);
             setStopId(1002864);
-            setRoute("S2");
             setResponse(response);
             setExtractedText(response);
           } catch (error) {

@@ -1,7 +1,7 @@
 // App.js file
 
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Camera, CameraType } from "expo-camera";
 import {
   Button,
@@ -9,7 +9,6 @@ import {
   Text,
   Image,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
@@ -18,7 +17,6 @@ import {
 import { fetch_stop, fetch_path, fetch_positions } from "./scripts/api";
 import * as ImagePicker from "expo-image-picker";
 import Services from "./components/services/Services";
-import { fetch_path, fetch_stop } from "./scripts/api";
 import Map from "./components/map/Map";
 
 export default function App() {

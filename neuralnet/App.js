@@ -114,7 +114,7 @@ export default function App() {
   // Function to capture an image using the device's camera
   const pickImageCamera = async () => {
     // Request permission to access the camera
-    const { status } = await Camera.requestPermissionsAsync();
+    const { status } = await Camera.requestCameraPermissionsAsync();
     if (status === "granted") {
       setStartCamera(true);
 
@@ -154,29 +154,12 @@ export default function App() {
     }
   };
 
-  // const renderResponse = (obj, depth = 0) => {
-  //     return (
-  //         <Text style={styles.subheading}>{obj.stop_name} (#{obj.stop_id})</Text>
-  //     )
-  // return Object.keys(obj).sort().map((key, index) => {
-  //   const value = obj[key];
-  //   if (typeof value === 'object' && value !== null) {
-  //  return (
-  //    <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
-  //      {key}:
-  //      {renderResponse(value, depth + 1)}
-  //    </Text>
-  //  );
-  //   } else {
-  //  return (
-  //    <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
-  //      {`${key}: ${value}`}
-  //    </Text>
-  //  );
-  //   }
-  // });
-  // };
   const renderResponse = (obj, depth = 0) => {
+    return (
+      <Text style={styles.subheading}>
+        {obj.stop_name} (#{obj.stop_id})
+      </Text>
+    );
     return Object.keys(obj)
       .sort()
       .map((key, index) => {
@@ -196,6 +179,26 @@ export default function App() {
         }
       });
   };
+  // const renderResponse = (obj, depth = 0) => {
+  //   return Object.keys(obj)
+  //     .sort()
+  //     .map((key, index) => {
+  //       const value = obj[key];
+  //       if (typeof value === "object" && value !== null) {
+  //         return (
+  //           <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
+  //             {key}:{renderResponse(value, depth + 1)}
+  //           </Text>
+  //         );
+  //       } else {
+  //         return (
+  //           <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
+  //             {`${key}: ${value}`}
+  //           </Text>
+  //         );
+  //       }
+  //     });
+  // };
 
   const takePicture = async () => {
     // camera is a reference to the Camera component

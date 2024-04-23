@@ -15,7 +15,7 @@ import {
   Pressable,
   ImageBackground,
 } from "react-native";
-import { fetch_stop, fetch_path, fetch_positions } from "./scripts/api";
+import { fetch_stop, fetch_path, fetch_ocr } from "./scripts/api";
 import * as ImagePicker from "expo-image-picker";
 import Services from "./components/services/Services";
 import Map from "./components/map/Map";
@@ -132,10 +132,17 @@ export default function App() {
   // Function to perform OCR on an image
   // and extract text
   const performOCR = async (file) => {
+
     try {
       setLoading(true);
-      const response = await fetch_stop(1002864);
-      setStopId(1002864);
+
+      const stop_id = await fetch_ocr(file);
+
+      if (stop_id == '') return;
+
+      const response = await fetch_stop(stop_id);
+
+      setStopId(stop_id);
       setResponse(response);
       setExtractedText(response);
     } catch (error) {
@@ -151,25 +158,7 @@ export default function App() {
         {obj.stop_name} (#{obj.stop_id})
       </Text>
     );
-    return Object.keys(obj)
-      .sort()
-      .map((key, index) => {
-        const value = obj[key];
-        if (typeof value === "object" && value !== null) {
-          return (
-            <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
-              {key}:{renderResponse(value, depth + 1)}
-            </Text>
-          );
-        } else {
-          return (
-            <Text key={index} style={[styles.text, { marginLeft: depth * 10 }]}>
-              {`${key}: ${value}`}
-            </Text>
-          );
-        }
-      });
-  };
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -181,6 +170,7 @@ export default function App() {
           alignItems: "center",
         }}
         centerContent={true}
+        showsVerticalScrollIndicator={false}
       >
         <Text style={styles.heading}>WMATA Bus Timings Retriever</Text>
         <Text style={styles.subheading}>Neural Networks & Deep Learning</Text>

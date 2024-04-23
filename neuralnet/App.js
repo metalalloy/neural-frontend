@@ -2,18 +2,13 @@
 
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
-import { Camera, CameraType } from "expo-camera";
 import {
-  Button,
   StyleSheet,
   Text,
   Image,
-  View,
   ScrollView,
-  TouchableOpacity,
   SafeAreaView,
   Pressable,
-  ImageBackground,
 } from "react-native";
 import { fetch_stop, fetch_path, fetch_ocr } from "./scripts/api";
 import * as ImagePicker from "expo-image-picker";

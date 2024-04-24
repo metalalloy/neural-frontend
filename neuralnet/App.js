@@ -108,7 +108,6 @@ function DetailsScreen({navigation}) {
       setLat(stopLat);
       setLon(stopLon);
     };
-    loadPath();
 
     const intervalUpdate = setInterval(() => {
       const fetchData = async () => {
@@ -128,12 +127,15 @@ function DetailsScreen({navigation}) {
         }
         setRoutes(tempRoutes);
       };
-      fetchData();
-    }, 5000);
 
-    return () => {
-      clearInterval(intervalUpdate);
-    };
+      if (stopId) {
+        loadPath();
+        fetchData();
+        return () => {
+          clearInterval(intervalUpdate);
+        };
+      }
+    }, 5000);
   }, [stopId]);
 
   // State while getting response from API
@@ -143,13 +145,12 @@ function DetailsScreen({navigation}) {
   // Function to perform OCR on an image
   // and extract text
   const performOCR = async (file) => {
-
     try {
       setLoading(true);
 
       const stop_id = await fetch_ocr(file);
-
-      if (stop_id == '') return;
+      console.warn(stopId);
+      if (stop_id == "") return;
 
       const response = await fetch_stop(stop_id);
 
@@ -169,7 +170,7 @@ function DetailsScreen({navigation}) {
         {obj.stop_name} (#{obj.stop_id})
       </Text>
     );
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>

@@ -49,7 +49,6 @@ export default function App() {
       setLat(stopLat);
       setLon(stopLon);
     };
-    loadPath();
 
     const intervalUpdate = setInterval(() => {
       const fetchData = async () => {
@@ -69,12 +68,15 @@ export default function App() {
         }
         setRoutes(tempRoutes);
       };
-      fetchData();
-    }, 5000);
 
-    return () => {
-      clearInterval(intervalUpdate);
-    };
+      if (stopId) {
+        loadPath();
+        fetchData();
+        return () => {
+          clearInterval(intervalUpdate);
+        };
+      }
+    }, 5000);
   }, [stopId]);
 
   // State while getting response from API

@@ -7,6 +7,7 @@ export default styles = StyleSheet.create({
 		alignItems: "center", 
 		justifyContent: "space-evenly", 
 		backgroundColor: "#ff0", 
+		borderWidth: 1,
 		height: "100%", 
 	}, 
 	heading: { 
@@ -37,6 +38,5 @@ export default styles = StyleSheet.create({
 	mapContainer: {
 		width: "100%",
 		height: 300,
-		borderWidth: 1,
 	}
 });

@@ -11,12 +11,71 @@ import {
   SafeAreaView,
   Pressable,
 } from "react-native";
+import {NavigationContainer} from "@react-navigation/native";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import { fetch_stop, fetch_path, fetch_ocr } from "./scripts/api";
 import * as ImagePicker from "expo-image-picker";
 import Services from "./components/services/Services";
 import Map from "./components/map/Map";
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName = "Home">
+        <Stack.Screen name="Home" component={HomeScreen} options={{title:"Scanner"}}/>
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+export default App;
+
+
+function HomeScreen({navigation}) {
+   // Function to capture an image using the device's camera
+   const pickImageCamera = async () => {
+    // Request permission to access the camera
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status === "granted") {
+
+      // Permission granted, proceed with launching camera
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        base64: true,
+        allowsMultipleSelection: false,
+      });
+
+      if (!result.cancelled) {
+        // Perform OCR on the captured image
+        // Set the captured image in state
+        navigation.navigate('Details');
+        performOCR(result.assets[0]);
+        setImage(result.assets[0].uri);
+      }
+    } else {
+      // Permission denied
+      alert("Permission to access camera denied");
+    }
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Home Screen</Text>
+      <Pressable style={styles.button} onPress={(pickImageCamera)}>
+          <Text style={styles.buttonText}>Use the Camera</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={() => navigation.navigate('Details')}>
+        <Text style={styles.buttonText}>Go to Details</Text>
+      </Pressable>
+    </SafeAreaView>
+  );
+}
+
+
+function DetailsScreen({navigation}) {
   const [stopId, setStopId] = useState();
   const [routes, setRoutes] = useState();
   const [paths, setPaths] = useState();
@@ -95,59 +154,15 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
 
-  // Function to pick an image from gallery
-  const pickImageGallery = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      base64: true,
-      allowsMultipleSelection: false,
-    });
-    if (!result.canceled) {
-      // Perform OCR on the selected image
-      performOCR(result.assets[0]);
-
-      // Set the selected image in state
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  // Function to capture an image using the device's camera
-  const pickImageCamera = async () => {
-    // Request permission to access the camera
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status === "granted") {
-
-      // Permission granted, proceed with launching camera
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        base64: true,
-        allowsMultipleSelection: false,
-      });
-
-      if (!result.cancelled) {
-        // Perform OCR on the captured image
-        // Set the captured image in state
-        performOCR(result.assets[0]);
-        setImage(result.assets[0].uri);
-      }
-    } else {
-      // Permission denied
-      alert("Permission to access camera denied");
-    }
-  };
-
   // Function to perform OCR on an image
   // and extract text
   const performOCR = async (file) => {
-
     try {
       setLoading(true);
 
       const stop_id = await fetch_ocr(file);
-
-      if (stop_id == '') return;
+      console.warn(stopId);
+      if (stop_id == "") return;
 
       const response = await fetch_stop(stop_id);
 
@@ -167,7 +182,7 @@ export default function App() {
         {obj.stop_name} (#{obj.stop_id})
       </Text>
     );
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -181,14 +196,11 @@ export default function App() {
         centerContent={true}
         showsVerticalScrollIndicator={false}
       >
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Home')}>
+          <Text style={styles.buttonText}>Home</Text>
+        </Pressable>
         <Text style={styles.heading}>WMATA Bus Timings Retriever</Text>
         <Text style={styles.subheading}>Neural Networks & Deep Learning</Text>
-        <Pressable style={styles.button} onPress={pickImageGallery}>
-          <Text style={styles.buttonText}>Choose from gallery</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={pickImageCamera}>
-          <Text style={styles.buttonText}>Use the Camera</Text>
-        </Pressable>
 
         {image && (
           <Image
@@ -226,6 +238,8 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

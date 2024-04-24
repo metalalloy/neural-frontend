@@ -1,8 +1,9 @@
 // App.js file
 
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   Image,
@@ -22,6 +23,7 @@ export default function App() {
   const [route, setRoute] = useState();
   const [lon, setLon] = useState();
   const [lat, setLat] = useState();
+  const refInterval = useRef();
 
   // State to hold the selected image
   const [image, setImage] = useState(null);
@@ -30,6 +32,12 @@ export default function App() {
   const [extractedText, setExtractedText] = useState("");
 
   useEffect(() => {
+    if (refInterval) {
+      clearInterval(refInterval.current);
+    }
+
+    if (stopId == "") return;
+    setLoading(true);
     const loadPath = async () => {
       const stopInfo = await fetch_stop(stopId);
       const stopLon = stopInfo.stop_lon;
@@ -68,15 +76,19 @@ export default function App() {
         }
         setRoutes(tempRoutes);
       };
-
-      if (stopId) {
-        loadPath();
-        fetchData();
-        return () => {
-          clearInterval(intervalUpdate);
-        };
-      }
+      fetchData();
     }, 5000);
+
+    refInterval.current = intervalUpdate;
+
+    setLoading(true);
+    loadPath();
+    setLoading(false);
+  
+    return () => {
+      console.warn('clearning')
+      clearInterval(refInterval);
+    };
   }, [stopId]);
 
   // State while getting response from API
@@ -191,22 +203,25 @@ export default function App() {
         )}
         <Text style={styles.subheading2}>Bus Stop Information:</Text>
         {loading ? (
-          <Text style={styles.text}>Loading...</Text>
+          <ActivityIndicator size="large"/>
         ) : (
-          response && renderResponse(response)
+          <>
+          {response && renderResponse(response)}
+          <Services routes={routes} setRoute={setRoute} />
+          {paths && route && route in paths && lat && lon && (
+            <Map
+              lon={lon}
+              lat={lat}
+              path={paths[route].coords}
+              route={route}
+              dir={paths[route].dir}
+              vars={paths[route].variations}
+            />
+          )}
+          </>
         )}
         <StatusBar style="auto" />
-        <Services routes={routes} setRoute={setRoute} />
-        {paths && route && route in paths && lat && lon && (
-          <Map
-            lon={lon}
-            lat={lat}
-            path={paths[route].coords}
-            route={route}
-            dir={paths[route].dir}
-            vars={paths[route].variations}
-          />
-        )}
+        
       </ScrollView>
     </SafeAreaView>
   );

@@ -14,6 +14,10 @@ import { fetch_stop, fetch_path, fetch_ocr } from "./scripts/api";
 import * as ImagePicker from "expo-image-picker";
 import Services from "./components/services/Services";
 import Map from "./components/map/Map";
+import { LogBox } from "react-native";
+
+// Ignore all
+LogBox.ignoreAllLogs();
 
 export default function App() {
   const [stopId, setStopId] = useState();
@@ -105,7 +109,6 @@ export default function App() {
     // Request permission to access the camera
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status === "granted") {
-
       // Permission granted, proceed with launching camera
       let result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -129,13 +132,12 @@ export default function App() {
   // Function to perform OCR on an image
   // and extract text
   const performOCR = async (file) => {
-
     try {
       setLoading(true);
 
       const stop_id = await fetch_ocr(file);
-
-      if (stop_id == '') return;
+      console.warn(stopId);
+      if (stop_id == "") return;
 
       const response = await fetch_stop(stop_id);
 
@@ -155,7 +157,7 @@ export default function App() {
         {obj.stop_name} (#{obj.stop_id})
       </Text>
     );
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>

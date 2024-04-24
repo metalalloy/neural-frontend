@@ -1,5 +1,5 @@
 WMATA_API_URL = "http://siahweehung1748.pythonanywhere.com";
-OCR_API_URL = "https://67fb-161-253-25-30.ngrok-free.app";
+OCR_API_URL = "https://caf5-161-253-25-30.ngrok-free.app";
 
 export async function fetch_stop(stop_id) {
     console.warn(`${WMATA_API_URL}/stop?stop_id=${stop_id}`)

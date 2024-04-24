@@ -34,6 +34,28 @@ export default App;
 
 
 function HomeScreen({navigation}) {
+    // Function to perform OCR on an image
+  // and extract text
+  const performOCR = async (file) => {
+    try {
+      // setLoading(true);
+
+      return await fetch_ocr(file);
+      // console.warn(stopId);
+      if (stop_id == "") return;
+
+      // const response = await fetch_stop(stop_id);
+
+      // setStopId(stop_id);
+      // setResponse(response);
+      // setExtractedText(response);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
    // Function to capture an image using the device's camera
    const pickImageCamera = async () => {
     // Request permission to access the camera
@@ -51,8 +73,8 @@ function HomeScreen({navigation}) {
       if (!result.cancelled) {
         // Perform OCR on the captured image
         // Set the captured image in state
-        navigation.navigate('Details');
-        performOCR(result.assets[0]);
+        const stop_id = await performOCR(result.assets[0]);
+        navigation.navigate('Details', {key: stop_id});
         setImage(result.assets[0].uri);
       }
     } else {
@@ -63,23 +85,22 @@ function HomeScreen({navigation}) {
 
   return (
     <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
+      <Text style={styles.heading}>WMATA Bus Timings Retriever</Text>
+      <Text style={styles.subheading}>Neural Networks & Deep Learning</Text>
       <Pressable style={styles.button} onPress={(pickImageCamera)}>
           <Text style={styles.buttonText}>Use the Camera</Text>
-      </Pressable>
-      <Pressable style={styles.button} onPress={() => navigation.navigate('Details')}>
-        <Text style={styles.buttonText}>Go to Details</Text>
       </Pressable>
     </SafeAreaView>
   );
 }
 
 
-function DetailsScreen({navigation}) {
-  const [stopId, setStopId] = useState();
+function DetailsScreen({route}) {
+  console.warn(route.params)
+  const [stopId, setStopId] = useState(route.params?.key);
   const [routes, setRoutes] = useState();
   const [paths, setPaths] = useState();
-  const [route, setRoute] = useState();
+  const [_route, setRoute] = useState();
   const [lon, setLon] = useState();
   const [lat, setLat] = useState();
   const refInterval = useRef();
@@ -154,27 +175,27 @@ function DetailsScreen({navigation}) {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
 
-  // Function to perform OCR on an image
-  // and extract text
-  const performOCR = async (file) => {
-    try {
-      setLoading(true);
+  // // Function to perform OCR on an image
+  // // and extract text
+  // const performOCR = async (file) => {
+  //   try {
+  //     setLoading(true);
 
-      const stop_id = await fetch_ocr(file);
-      console.warn(stopId);
-      if (stop_id == "") return;
+  //     const stop_id = await fetch_ocr(file);
+  //     console.warn(stopId);
+  //     if (stop_id == "") return;
 
-      const response = await fetch_stop(stop_id);
+  //     const response = await fetch_stop(stop_id);
 
-      setStopId(stop_id);
-      setResponse(response);
-      setExtractedText(response);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setStopId(stop_id);
+  //     setResponse(response);
+  //     setExtractedText(response);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const renderResponse = (obj, depth = 0) => {
     return (
@@ -190,18 +211,11 @@ function DetailsScreen({navigation}) {
         style={styles.scrollView}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
           alignItems: "center",
         }}
         centerContent={true}
         showsVerticalScrollIndicator={false}
       >
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.buttonText}>Home</Text>
-        </Pressable>
-        <Text style={styles.heading}>WMATA Bus Timings Retriever</Text>
-        <Text style={styles.subheading}>Neural Networks & Deep Learning</Text>
-
         {image && (
           <Image
             source={{ uri: image }}
@@ -220,14 +234,14 @@ function DetailsScreen({navigation}) {
           <>
           {response && renderResponse(response)}
           <Services routes={routes} setRoute={setRoute} />
-          {paths && route && route in paths && lat && lon && (
+          {paths && _route && _route in paths && lat && lon && (
             <Map
               lon={lon}
               lat={lat}
-              path={paths[route].coords}
-              route={route}
-              dir={paths[route].dir}
-              vars={paths[route].variations}
+              path={paths[_route].coords}
+              route={_route}
+              dir={paths[_route].dir}
+              vars={paths[_route].variations}
             />
           )}
           </>
@@ -245,7 +259,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#FFFFFF",
   },
   heading: {
@@ -285,4 +298,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#132676", // Black color for text
   },
+  scrollView: {
+    width: '100%'
+  }
 });

@@ -22,3 +22,5 @@ npm i
 # start server locally
 npx expo start
 ```
+## Scan QR code using the camera on your device which will open up the Expo Go app
+Changes you make will be seen in-real time in the Expo Go app.

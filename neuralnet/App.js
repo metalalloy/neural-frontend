@@ -86,7 +86,7 @@ function HomeScreen({navigation}) {
   return (
     <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text style={styles.heading}>WMATA Bus Timings Retriever</Text>
-      <Text style={styles.subheading}>Neural Networks & Deep Learning</Text>
+      <Text style={styles.subheading}>Aloysius, Wee Hung, Esther</Text>
       <Pressable style={styles.button} onPress={(pickImageCamera)}>
           <Text style={styles.buttonText}>Use the Camera</Text>
       </Pressable>
@@ -264,12 +264,14 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: "bold",
+    fontStyle:"italic",
     marginBottom: 20,
-    color: "#007AFF",
+    color: "#000000",
   },
   subheading: {
     fontSize: 22,
     fontWeight: "bold",
+    justifyContent: "space-evenly",
     marginBottom: 20,
     color: "#132676", // Black color for subheading
   },
